@@ -21,7 +21,9 @@ module.exports = {
       env: {
         mocha: true,
       },
-      rules: {},
+      rules: {
+        "eslint-require-jsdoc": false,
+      },
     },
   ],
   globals: {},

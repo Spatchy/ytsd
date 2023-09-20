@@ -1,19 +1,29 @@
-/**
- * Import function triggers from their respective submodules:
- *
- * const {onCall} = require("firebase-functions/v2/https");
- * const {onDocumentWritten} = require("firebase-functions/v2/firestore");
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
- */
+const { google } = require("googleapis")
 
-const {onRequest} = require("firebase-functions/v2/https");
-const logger = require("firebase-functions/logger");
+async function main () {
+  const authClient = new google.auth.OAuth2({
+    clientId: process.env.clientId,
+    clientSecret: process.env.clientSecret
+  })
 
-// Create and deploy your first functions
-// https://firebase.google.com/docs/functions/get-started
+  authClient.setCredentials({
+    refresh_token: process.env.refreshToken
+  })
 
-// exports.helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+  const youtube = google.youtube({
+    auth: authClient,
+    version: "v3"
+  })
+
+
+  const videoId = process.env.videoId
+
+  const videoRes = await youtube.videos.list({
+    id: videoId,
+    part: 'snippet,statistics'
+  })
+
+  console.log(JSON.stringify(videoRes, null, 2))
+}
+
+main()

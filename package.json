@@ -1,5 +1,5 @@
 {
   "dependencies": {
-    "google-apis": "^1.0.0"
+    "googleapis": "^126.0.1"
   }
 }
