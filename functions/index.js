@@ -1,6 +1,22 @@
 const { google } = require("googleapis")
 
 async function main () {
+
+  const calculateRemainingTime = (viewsAtLastCheck, timerAtLastCheck, currentViews) => {
+    const newViews = currentViews - viewsAtLastCheck
+    const tickedTimer = timerAtLastCheck - 600 // runs every 10 minutes so remove 10 minutes from timer
+    const finalTimer = tickedTimer + (newViews * 30)
+    if (finalTimer <= 0) {
+      destroyVideo()
+    }
+    return finalTimer
+  }
+
+  const stringifyTimerToHours = (timer) => {
+    const timerInHours = timer / 3600
+    return (Math.round(timerInHours * 10) / 10).toFixed(1)
+  }
+
   const authClient = new google.auth.OAuth2({
     clientId: process.env.clientId,
     clientSecret: process.env.clientSecret
@@ -23,7 +39,31 @@ async function main () {
     part: 'snippet,statistics'
   })
 
-  console.log(JSON.stringify(videoRes, null, 2))
+  const { statistics, snippet } = videoRes.data.items[0]
+
+
+  let tagsObject = {}
+  snippet.tags.forEach(tag => {
+    splitTag = tag.split("=")
+    tagsObject = {
+      ...tagsObject,
+      [splitTag[0]]:splitTag[1]
+    }
+  })
+
+  // 48 hours = 172800
+  const timer = calculateRemainingTime(tagsObject.savedViews, tagsObject.savedTimer, statistics.viewCount)
+  const stringifiedTimer = stringifyTimerToHours(timer)
+
+  const newTitle = `This video will self destruct in ${stringifiedTimer} hours`
+  const newTags = [
+    `savedViews=${statistics.viewCount}`,
+    `savedTimer=${timer}`
+  ]
+
+  console.log(newTitle)
+  console.log(newTags)
+
 }
 
 main()
