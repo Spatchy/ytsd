@@ -2,6 +2,29 @@ const { google } = require("googleapis")
 
 async function main () {
 
+  const destroyVideo = async () => {
+    const videoRes = await youtube.videos.list({
+      id: videoId,
+      part: 'status'
+    })
+
+    const { status } = videoRes.data.items[0]
+
+    status.privacyStatus = "private"
+
+    console.log(status)
+
+    await youtube.videos.update({
+      part: "status",
+      requestBody: {
+        id: process.env.VIDEO_ID,
+        status
+      }
+    })
+
+    console.log("Video Destroyed!")
+  }
+
   const calculateRemainingTime = (viewsAtLastCheck, likesAtLastCheck, timerAtLastCheck, currentViews, currentLikes) => {
     const newViews = currentViews - viewsAtLastCheck
     const newLikes = currentLikes - likesAtLastCheck
