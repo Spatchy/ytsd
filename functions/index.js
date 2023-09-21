@@ -1,6 +1,7 @@
+const functions = require("firebase-functions")
 const { google } = require("googleapis")
 
-async function main () {
+exports.ytsd = functions.pubsub.schedule('every 10 minutes').onRun(async () => {
 
   const destroyVideo = async () => {
     const videoRes = await youtube.videos.list({
@@ -108,6 +109,4 @@ async function main () {
   })
 
   console.log("Updated successfully!")
-}
-
-main()
+})
