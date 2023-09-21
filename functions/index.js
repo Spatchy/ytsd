@@ -19,12 +19,12 @@ async function main () {
   }
 
   const authClient = new google.auth.OAuth2({
-    clientId: process.env.clientId,
-    clientSecret: process.env.clientSecret
+    clientId: process.env.CLIENT_ID,
+    clientSecret: process.env.CLIENT_SECRET
   })
 
   authClient.setCredentials({
-    refresh_token: process.env.refreshToken
+    refresh_token: process.env.REFRESH_TOKEN
   })
 
   const youtube = google.youtube({
@@ -33,7 +33,7 @@ async function main () {
   })
 
 
-  const videoId = process.env.videoId
+  const videoId = process.env.VIDEO_ID
 
   const videoRes = await youtube.videos.list({
     id: videoId,
@@ -73,6 +73,18 @@ async function main () {
   console.log(newTitle)
   console.log(newTags)
 
+  snippet.title = newTitle,
+  snippet.tags = newTags
+
+  await youtube.videos.update({
+    part: "snippet",
+    requestBody: {
+      id: process.env.VIDEO_ID,
+      snippet
+    }
+  })
+
+  console.log("Updated successfully!")
 }
 
 main()
