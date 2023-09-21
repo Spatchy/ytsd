@@ -1,12 +1,11 @@
 const functions = require("firebase-functions")
 const { google } = require("googleapis")
 
-exports.ytsd = functions.pubsub.schedule('every 10 minutes').onRun(async () => {
-
+exports.ytsd = functions.pubsub.schedule("every 10 minutes").onRun(async () => {
   const destroyVideo = async () => {
     const videoRes = await youtube.videos.list({
       id: videoId,
-      part: 'status'
+      part: "status"
     })
 
     const { status } = videoRes.data.items[0]
@@ -61,28 +60,28 @@ exports.ytsd = functions.pubsub.schedule('every 10 minutes').onRun(async () => {
 
   const videoRes = await youtube.videos.list({
     id: videoId,
-    part: 'snippet,statistics'
+    part: "snippet,statistics"
   })
 
   const { statistics, snippet } = videoRes.data.items[0]
 
 
   let tagsObject = {}
-  snippet.tags.forEach(tag => {
-    splitTag = tag.split("=")
+  snippet.tags.forEach( (tag) => {
+    const splitTag = tag.split("=")
     tagsObject = {
       ...tagsObject,
-      [splitTag[0]]:splitTag[1]
+      [splitTag[0]]: splitTag[1]
     }
   })
 
   // 48 hours = 172800
   const timer = calculateRemainingTime(
-    tagsObject.savedViews,
-    tagsObject.savedLikes,
-    tagsObject.savedTimer,
-    statistics.viewCount,
-    statistics.likeCount
+      tagsObject.savedViews,
+      tagsObject.savedLikes,
+      tagsObject.savedTimer,
+      statistics.viewCount,
+      statistics.likeCount
   )
 
   const stringifiedTimer = stringifyTimerToHours(timer)
